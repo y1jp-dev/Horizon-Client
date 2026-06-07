@@ -1,0 +1,37 @@
+{
+  "required": true,
+  "package": "dev.horizon.client.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "ActivityDebugMixin",
+    "ActivityDebugSoundMixin",
+    "ClientMixin",
+    "RelogDebugMixin",
+    "FreecamCameraMixin",
+    "FreecamEntityMixin",
+    "FreecamInputMixin",
+    "FreecamKeyboardMixin",
+    "FreecamInteractionMixin",
+    "FreecamWorldRendererMixin",
+    "HandledScreenAccessor",
+    "HandViewMixin",
+    "SwingSpeedMixin",
+    "InGameHudMixin",
+    "StatusEffectsMixin",
+    "OwnNametagMixin",
+    "SoundDebugMixin",
+    "NameProtectMixin",
+    "FakeScoreboardMixin",
+    "BlockEntityDebugMixin",
+    "SpawnerDebugMixin",
+    "SusChunkMixin",
+    "OreESPMixin",
+    "PrimeChunkMixin",
+    "MinecraftClientAccessor",
+    "SkinProtectMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
