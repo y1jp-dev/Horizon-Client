@@ -20,15 +20,15 @@ import java.util.List;
 
 public class SpawnerESPModule extends Module {
 
-    public final Setting<Boolean> tracers    = addSetting(new Setting<>("Tracers",     "Tracers",                     false));
-    public final Setting<Boolean> outline    = addSetting(new Setting<>("Outline",     "Show outline",                true));
-    public final Setting<Double>  fillAlpha  = addSetting(new Setting<>("Fill Alpha",  "Fill opacity",                3.0, 0.0, 20.0));
+    public final Setting<Boolean> tracers    = addSetting(new Setting<>("Tracers",     "Tracers",                     true));
+    public final Setting<Boolean> outline    = addSetting(new Setting<>("Outline",     "Show outline",                false));
+    public final Setting<Double>  fillAlpha  = addSetting(new Setting<>("Fill Alpha",  "Fill opacity",                20.0, 0.0, 20.0));
     public final Setting<Boolean> fullCover  = addSetting(new Setting<>("Full Cover",  "Cover the entire block face", false));
 
     private static final float FR = 1.0f, FG = 0.0f, FB = 0.0f;
     private static final float OR = 1.0f, OG = 0.2f, OB = 0.2f;
 
-    private static final double INSET = 0.05;
+    private static final double INSET = 2.0 / 16.0;
 
     public SpawnerESPModule() {
         super("Spawner ESP", "Highlights mob spawners");
