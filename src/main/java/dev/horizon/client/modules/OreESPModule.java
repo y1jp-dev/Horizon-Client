@@ -59,7 +59,7 @@ public class OreESPModule extends Module {
     private ExecutorService executor;
 
     public OreESPModule() {
-        super("Ore ESP", "Highlights deepslate ores");
+        super("Ore ESP", "Highlights ores");
     }
 
     @Override
@@ -258,15 +258,15 @@ public class OreESPModule extends Module {
     }
 
     private int typeOf(Block b) {
-        if (b == Blocks.DEEPSLATE_COAL_ORE     && showCoal.getValue())     return T_COAL;
-        if (b == Blocks.DEEPSLATE_IRON_ORE     && showIron.getValue())     return T_IRON;
-        if (b == Blocks.DEEPSLATE_GOLD_ORE     && showGold.getValue())     return T_GOLD;
-        if (b == Blocks.DEEPSLATE_REDSTONE_ORE && showRedstone.getValue()) return T_REDSTONE;
-        if (b == Blocks.DEEPSLATE_LAPIS_ORE    && showLapis.getValue())    return T_LAPIS;
-        if (b == Blocks.DEEPSLATE_DIAMOND_ORE  && showDiamond.getValue())  return T_DIAMOND;
-        if (b == Blocks.DEEPSLATE_EMERALD_ORE  && showEmerald.getValue())  return T_EMERALD;
-        if (b == Blocks.ANCIENT_DEBRIS         && showDebris.getValue())   return T_DEBRIS;
-        if (b == Blocks.GILDED_BLACKSTONE      && showGilded.getValue())   return T_GILDED;
+        if ((b == Blocks.COAL_ORE          || b == Blocks.DEEPSLATE_COAL_ORE)     && showCoal.getValue())     return T_COAL;
+        if ((b == Blocks.IRON_ORE          || b == Blocks.DEEPSLATE_IRON_ORE)     && showIron.getValue())     return T_IRON;
+        if ((b == Blocks.GOLD_ORE          || b == Blocks.DEEPSLATE_GOLD_ORE)     && showGold.getValue())     return T_GOLD;
+        if ((b == Blocks.REDSTONE_ORE      || b == Blocks.DEEPSLATE_REDSTONE_ORE) && showRedstone.getValue()) return T_REDSTONE;
+        if ((b == Blocks.LAPIS_ORE         || b == Blocks.DEEPSLATE_LAPIS_ORE)    && showLapis.getValue())    return T_LAPIS;
+        if ((b == Blocks.DIAMOND_ORE       || b == Blocks.DEEPSLATE_DIAMOND_ORE)  && showDiamond.getValue())  return T_DIAMOND;
+        if ((b == Blocks.EMERALD_ORE       || b == Blocks.DEEPSLATE_EMERALD_ORE)  && showEmerald.getValue())  return T_EMERALD;
+        if (b == Blocks.ANCIENT_DEBRIS                                             && showDebris.getValue())   return T_DEBRIS;
+        if (b == Blocks.GILDED_BLACKSTONE                                          && showGilded.getValue())   return T_GILDED;
         return -1;
     }
 
