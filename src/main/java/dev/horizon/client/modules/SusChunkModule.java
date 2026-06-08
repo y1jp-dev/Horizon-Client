@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import dev.horizon.client.module.Module;
 import dev.horizon.client.module.Setting;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
@@ -14,7 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.world.LightType;
 import net.minecraft.world.chunk.WorldChunk;
 import org.joml.Matrix4f;
 
@@ -196,46 +195,22 @@ public class SusChunkModule extends Module {
         WorldChunk chunk = mc.world.getChunk(cp.x, cp.z);
         if (chunk == null || chunk.isEmpty()) return;
 
-        WorldChunk chunkN = mc.world.getChunk(cp.x,     cp.z - 1);
-        WorldChunk chunkS = mc.world.getChunk(cp.x,     cp.z + 1);
-        WorldChunk chunkW = mc.world.getChunk(cp.x - 1, cp.z);
-        WorldChunk chunkE = mc.world.getChunk(cp.x + 1, cp.z);
-
-        int startX  = cp.getStartX();
-        int startZ  = cp.getStartZ();
-        int bottomY = mc.world.getBottomY();
-        ChunkSection[] sections = chunk.getSectionArray();
+        int startX = cp.getStartX();
+        int startZ = cp.getStartZ();
 
         int count = 0;
         List<Long> blocks = new ArrayList<>();
 
-        for (int si = 0; si < sections.length; si++) {
-            ChunkSection sec = sections[si];
-            if (sec == null || sec.isEmpty()) continue;
-            int baseY = bottomY + si * 16;
-
+        for (int y = -64; y <= 70; y++) {
             for (int lx = 0; lx < 16; lx++) {
                 for (int lz = 0; lz < 16; lz++) {
-                    for (int ly = 0; ly < 16; ly++) {
-                        Block blk = sec.getBlockState(lx, ly, lz).getBlock();
-                        int worldY = baseY + ly;
-
-                        if (blk == Blocks.AMETHYST_CLUSTER) {
+                    if (y > 50) continue;
+                    BlockPos pos = new BlockPos(startX + lx, y, startZ + lz);
+                    if (mc.world.getLightLevel(LightType.BLOCK, pos) == 5) {
+                        if (isAmethystNearby(mc, pos)) {
                             count++;
-                            blocks.add(new BlockPos(startX + lx, worldY, startZ + lz).asLong());
-                            continue;
+                            blocks.add(pos.asLong());
                         }
-
-                        if (blk != Blocks.STONE) continue;
-
-                        if (!hasAmethystNeighbour(sections, chunkN, chunkS, chunkW, chunkE,
-                                lx, ly, lz, si, worldY, bottomY)) continue;
-
-                        if (!hasExposedFace(sections, chunkN, chunkS, chunkW, chunkE,
-                                lx, ly, lz, si, worldY, bottomY)) continue;
-
-                        count++;
-                        blocks.add(new BlockPos(startX + lx, worldY, startZ + lz).asLong());
                     }
                 }
             }
@@ -244,80 +219,24 @@ public class SusChunkModule extends Module {
         pendingResults.add(new ScanResult(cp, count, blocks));
     }
 
-    private boolean hasAmethystNeighbour(ChunkSection[] sec,
-                                          WorldChunk N, WorldChunk S, WorldChunk W, WorldChunk E,
-                                          int lx, int ly, int lz, int si, int worldY, int bottomY) {
-        if (ly > 0) { if (isAmethyst(sec[si].getBlockState(lx, ly-1, lz).getBlock())) return true; }
-        else if (si > 0 && sec[si-1] != null) { if (isAmethyst(sec[si-1].getBlockState(lx, 15, lz).getBlock())) return true; }
-
-        if (ly < 15) { if (isAmethyst(sec[si].getBlockState(lx, ly+1, lz).getBlock())) return true; }
-        else if (si < sec.length-1 && sec[si+1] != null) { if (isAmethyst(sec[si+1].getBlockState(lx, 0, lz).getBlock())) return true; }
-
-        if (lz > 0) { if (isAmethyst(sec[si].getBlockState(lx, ly, lz-1).getBlock())) return true; }
-        else if (N != null) { if (isAmethyst(blockIn(N, lx, worldY, 15, bottomY))) return true; }
-
-        if (lz < 15) { if (isAmethyst(sec[si].getBlockState(lx, ly, lz+1).getBlock())) return true; }
-        else if (S != null) { if (isAmethyst(blockIn(S, lx, worldY, 0, bottomY))) return true; }
-
-        if (lx > 0) { if (isAmethyst(sec[si].getBlockState(lx-1, ly, lz).getBlock())) return true; }
-        else if (W != null) { if (isAmethyst(blockIn(W, 15, worldY, lz, bottomY))) return true; }
-
-        if (lx < 15) { if (isAmethyst(sec[si].getBlockState(lx+1, ly, lz).getBlock())) return true; }
-        else if (E != null) { if (isAmethyst(blockIn(E, 0, worldY, lz, bottomY))) return true; }
-
-        return false;
-    }
-
-    private boolean hasExposedFace(ChunkSection[] sec,
-                                    WorldChunk N, WorldChunk S, WorldChunk W, WorldChunk E,
-                                    int lx, int ly, int lz, int si, int worldY, int bottomY) {
-        if (ly > 0) { if (!isSolid(sec[si].getBlockState(lx, ly-1, lz))) return true; }
-        else if (si > 0 && sec[si-1] != null) { if (!isSolid(sec[si-1].getBlockState(lx, 15, lz))) return true; }
-        else return true;
-
-        if (ly < 15) { if (!isSolid(sec[si].getBlockState(lx, ly+1, lz))) return true; }
-        else if (si < sec.length-1 && sec[si+1] != null) { if (!isSolid(sec[si+1].getBlockState(lx, 0, lz))) return true; }
-        else return true;
-
-        if (lz > 0) { if (!isSolid(sec[si].getBlockState(lx, ly, lz-1))) return true; }
-        else if (N != null) { if (!isSolid(stateIn(N, lx, worldY, 15, bottomY))) return true; }
-        else return true;
-
-        if (lz < 15) { if (!isSolid(sec[si].getBlockState(lx, ly, lz+1))) return true; }
-        else if (S != null) { if (!isSolid(stateIn(S, lx, worldY, 0, bottomY))) return true; }
-        else return true;
-
-        if (lx > 0) { if (!isSolid(sec[si].getBlockState(lx-1, ly, lz))) return true; }
-        else if (W != null) { if (!isSolid(stateIn(W, 15, worldY, lz, bottomY))) return true; }
-        else return true;
-
-        if (lx < 15) { if (!isSolid(sec[si].getBlockState(lx+1, ly, lz))) return true; }
-        else if (E != null) { if (!isSolid(stateIn(E, 0, worldY, lz, bottomY))) return true; }
-        else return true;
-
-        return false;
-    }
-
-    private Block blockIn(WorldChunk c, int lx, int worldY, int lz, int bottomY) {
-        return stateIn(c, lx, worldY, lz, bottomY).getBlock();
-    }
-
-    private BlockState stateIn(WorldChunk c, int lx, int worldY, int lz, int bottomY) {
-        int si = (worldY - bottomY) >> 4;
-        int ly = (worldY - bottomY) & 15;
-        ChunkSection[] s = c.getSectionArray();
-        if (si < 0 || si >= s.length || s[si] == null) return Blocks.AIR.getDefaultState();
-        return s[si].getBlockState(lx, ly, lz);
-    }
-
-    private boolean isAmethyst(Block b) {
-        return b == Blocks.AMETHYST_BLOCK || b == Blocks.BUDDING_AMETHYST;
-    }
-
-    private boolean isSolid(BlockState s) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+    private boolean isAmethystNearby(MinecraftClient mc, BlockPos pos) {
         if (mc.world == null) return false;
-        return s.isOpaque() && s.isFullCube(mc.world, BlockPos.ORIGIN);
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    BlockState state = mc.world.getBlockState(pos.add(dx, dy, dz));
+                    if (state.isOf(Blocks.AMETHYST_CLUSTER)
+                            || state.isOf(Blocks.LARGE_AMETHYST_BUD)
+                            || state.isOf(Blocks.MEDIUM_AMETHYST_BUD)
+                            || state.isOf(Blocks.SMALL_AMETHYST_BUD)
+                            || state.isOf(Blocks.BUDDING_AMETHYST)
+                            || state.isOf(Blocks.AMETHYST_BLOCK)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void render(WorldRenderContext context) {
@@ -460,4 +379,4 @@ public class SusChunkModule extends Module {
     }
 
     private record ScanResult(ChunkPos pos, int count, List<Long> blocks) {}
-}
+    }
