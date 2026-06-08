@@ -27,9 +27,9 @@ public class StorageESPModule extends Module {
     public final Setting<Boolean> showDispensers    = addSetting(new Setting<>("Dispensers",         "Dispensers",        true));
     public final Setting<Boolean> showDroppers       = addSetting(new Setting<>("Droppers",            "Droppers",           true));
     public final Setting<Boolean> showPistons       = addSetting(new Setting<>("Pistons",           "Pistons",           true));
-    public final Setting<Boolean> tracers           = addSetting(new Setting<>("Tracers",     "Tracers",                     false));
-    public final Setting<Boolean> outline           = addSetting(new Setting<>("Outline",     "Show outline",                true));
-    public final Setting<Double>  fillAlpha         = addSetting(new Setting<>("Fill Alpha",  "Fill opacity",                3.2, 0.0, 20.0));
+    public final Setting<Boolean> tracers           = addSetting(new Setting<>("Tracers",     "Tracers",                     true));
+    public final Setting<Boolean> outline           = addSetting(new Setting<>("Outline",     "Show outline",                false));
+    public final Setting<Double>  fillAlpha         = addSetting(new Setting<>("Fill Alpha",  "Fill opacity",                15.0, 0.0, 20.0));
     public final Setting<Boolean> fullCover         = addSetting(new Setting<>("Full Cover",  "Cover the entire block face", false));
 
     private static final double INSET        = 2.0 / 16.0;
